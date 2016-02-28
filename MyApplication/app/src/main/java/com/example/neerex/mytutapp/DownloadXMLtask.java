@@ -148,6 +148,7 @@ public class DownloadXMLtask extends AsyncTask<String,Void,List<Item>> {
         if(!lastdatesaved.isEmpty())
         {
             updateSharedPreference("lastdatesaved",lastdatesaved);
+            int i=0;
         }
 
     }
