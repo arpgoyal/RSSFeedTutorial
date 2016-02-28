@@ -79,7 +79,7 @@ public class MainActivity extends Activity  {
                     items = list;
 
 
-                    ItemAdapter myadapter = new ItemAdapter(items);
+                    ItemAdapter myadapter = new ItemAdapter(items,getParent());
                     mylistview.setAdapter(myadapter);
 
                 }

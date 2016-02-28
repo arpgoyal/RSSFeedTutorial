@@ -2,6 +2,7 @@ package com.example.neerex.mytutapp;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -12,6 +13,7 @@ import android.util.Log;
 
 import com.example.neerex.mytutapp.Db.DataContract;
 import com.example.neerex.mytutapp.Db.DataHelper;
+import com.example.neerex.mytutapp.ImageService.ImageServiceClass;
 import com.squareup.picasso.Picasso;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -57,6 +59,9 @@ public class DownloadXMLtask extends AsyncTask<String,Void,List<Item>> {
             if(!CheckDate()) {
                 data = loadxmlfromNetwork(urls[0]);
                 UpdateSql(data);
+                ImageServiceClass obj = new ImageServiceClass(context,data);
+                Intent intent = new Intent(context, ImageServiceClass.class);
+                context.startService(intent);
             }
             else
             {
@@ -220,7 +225,7 @@ public class DownloadXMLtask extends AsyncTask<String,Void,List<Item>> {
         if(Lastsaveddate!=null) {
             SimpleDateFormat dfq = new SimpleDateFormat("EEE");
             String CurrentDateq = dfq.format(c.getTime());
-            if (CurrentDateq.equals("Sun")||CurrentDateq.equals("Sat"))
+            if (CurrentDateq.equals("Sat"))
             {
                 value=true;
             }

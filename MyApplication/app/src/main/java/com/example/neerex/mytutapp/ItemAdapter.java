@@ -3,6 +3,8 @@ package com.example.neerex.mytutapp;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,9 @@ import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,11 +32,12 @@ import java.util.List;
 public class ItemAdapter extends BaseAdapter {
 
     private List<Item> items= new ArrayList<Item>() ;
+    private  Context context;
 
-
-    public ItemAdapter(List<Item> list)
+    public ItemAdapter(List<Item> list,Context context)
     {
         this.items=list;
+        this.context=context;
     }
 
 
@@ -65,8 +71,12 @@ public class ItemAdapter extends BaseAdapter {
         ImageView Imageoftheday = (ImageView) view.findViewById(R.id.imageview);
         TextView Title = (TextView) view.findViewById(R.id.textView);
 
+
         if(localitem.getEnclosure() !=null) {
-            Picasso.with(parent.getContext()).load(localitem.getEnclosure()).resize(80,80).into(Imageoftheday);
+
+                Picasso.with(parent.getContext()).load(localitem.getEnclosure()).resize(80, 80).into(Imageoftheday);
+
+
         }
 
         if(localitem.getTitle() !=null) {
@@ -75,6 +85,23 @@ public class ItemAdapter extends BaseAdapter {
 
 
       return view;
+
+    }
+
+    public Bitmap CheckLocalDrive(int position) throws FileNotFoundException {
+
+        if(context.getFilesDir()!=null) {
+            String yourFilePath = context.getFilesDir() + "/" + String.valueOf(position) + ".jpg";
+
+            File yourFile = new File(yourFilePath);
+            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(yourFile));
+
+            return b;
+        }
+        else
+        {
+            return  null;
+        }
 
     }
 }
