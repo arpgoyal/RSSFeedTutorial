@@ -48,6 +48,7 @@ public  void parser() {
         Item objitem =null ;
 
         try {
+
               event = myParser.getEventType();
 
             while (event != XmlPullParser.END_DOCUMENT) {
@@ -105,14 +106,14 @@ public  void parser() {
                             }
                         }
 
-                        if(name.equals("docs")){
-                            event = myParser.next();
-                            if(event==4)
-                            {
-                                lstitem.add(objitem);
-                                break;
-                            }
-                        }
+//                        if(name.equals("docs")){
+//                            event = myParser.next();
+//                            if(event==4)
+//                            {
+//                                lstitem.add(objitem);
+//                                break;
+//                            }
+//                        }
 
 
                         break;

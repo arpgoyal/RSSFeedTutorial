@@ -4,22 +4,11 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/DetailImageView"
+        android:id="@+id/ImageView1"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="match_parent"
         />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Description"
-        android:id="@+id/txtdescription"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="link"
-        android:id="@+id/txtLink"/>
 
 
 </LinearLayout>

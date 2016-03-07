@@ -1,5 +1,6 @@
 package com.example.neerex.mytutapp;
 
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -13,13 +14,16 @@ import android.util.Log;
 
 import com.example.neerex.mytutapp.Db.DataContract;
 import com.example.neerex.mytutapp.Db.DataHelper;
+import com.example.neerex.mytutapp.ImageService.ImageIntentService;
 import com.example.neerex.mytutapp.ImageService.ImageServiceClass;
+import com.example.neerex.mytutapp.Utility.FileUtility;
 import com.squareup.picasso.Picasso;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -42,6 +46,10 @@ public class DownloadXMLtask extends AsyncTask<String,Void,List<Item>> {
     private SharedPreferences sharedpreferences;
     private String KEY = "lastdatesaved";
 
+    ProgressDialog pd ;
+
+
+
 
       public DownloadXMLtask(Context context)
       {
@@ -49,6 +57,19 @@ public class DownloadXMLtask extends AsyncTask<String,Void,List<Item>> {
           this.context =context;
            sharedpreferences = context.getSharedPreferences(KEY, Context.MODE_PRIVATE);
       }
+
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        pd = new ProgressDialog(context);
+        pd.setTitle("Please wait....");
+        pd.setMessage("Loading......");
+        pd.setCancelable(false);
+
+    }
+
+
     @Override
     protected List<Item> doInBackground(String... urls) {
 
@@ -57,11 +78,28 @@ public class DownloadXMLtask extends AsyncTask<String,Void,List<Item>> {
         {
 
             if(!CheckDate()) {
-                data = loadxmlfromNetwork(urls[0]);
-                UpdateSql(data);
-                ImageServiceClass obj = new ImageServiceClass(context,data);
-                Intent intent = new Intent(context, ImageServiceClass.class);
-                context.startService(intent);
+                 data = loadxmlfromNetwork(urls[0]);
+                if(!CheckSize(data)) {
+                    UpdateSql(data);
+                    FileUtility fileobj = new FileUtility();
+                    String path = fileobj.Appfolderstructure(context, "ImageDir");
+
+
+                    String[] url = new String[data.size()];
+                    for (int i = 0; i < url.length; i++) {
+                        url[i] = data.get(i).getEnclosure();
+                    }
+                }
+                else
+                {
+                    data =ReadDataSql();
+                }
+               // ImageServiceClass obj = new ImageServiceClass(context,data);
+
+//                Intent intent = new Intent(context, ImageIntentService.class);
+//                intent.putExtra("Items",url);
+//                intent.putExtra("path",path);
+//                context.startService(intent);
             }
             else
             {
@@ -80,7 +118,9 @@ public class DownloadXMLtask extends AsyncTask<String,Void,List<Item>> {
 
     @Override
     protected void onPostExecute(List<Item> list) {
+        pd.dismiss();
       result.onComplete(list);
+
     }
 
     private List loadxmlfromNetwork(String urls) throws IOException {
@@ -114,7 +154,7 @@ public class DownloadXMLtask extends AsyncTask<String,Void,List<Item>> {
         URL url = new URL(urls);
         HttpURLConnection conn =(HttpURLConnection)url.openConnection();
         conn.setReadTimeout(10000);
-        conn.setConnectTimeout(15000);
+        conn.setConnectTimeout(20000);
         conn.setRequestMethod("GET");
         conn.setDoInput(true);
         conn.connect();
@@ -135,26 +175,39 @@ public class DownloadXMLtask extends AsyncTask<String,Void,List<Item>> {
         ContentValues values = new ContentValues();
 
 
-        for (int i=0;i<items.size();i++) {
-            values.put(DataContract.DataEntry.Column_Name_title, items.get(i).getTitle());
-            values.put(DataContract.DataEntry.Column_Name_link, items.get(i).getLink());
-            values.put(DataContract.DataEntry.Column_Name_description, items.get(i).getDescription());
-            values.put(DataContract.DataEntry.Column_Name_enclosure, items.get(i).getEnclosure());
-            values.put(DataContract.DataEntry.Column_Name_pubdate,items.get(i).getPubDate());
+        try {
+            for (int i = items.size(); i >= 0; i--) {
+                values.put(DataContract.DataEntry.Column_Name_title, items.get(i).getTitle());
+                values.put(DataContract.DataEntry.Column_Name_link, items.get(i).getLink());
+                values.put(DataContract.DataEntry.Column_Name_description, items.get(i).getDescription());
+                values.put(DataContract.DataEntry.Column_Name_enclosure, items.get(i).getEnclosure());
+                values.put(DataContract.DataEntry.Column_Name_pubdate, items.get(i).getPubDate());
 
-            lastdatesaved =items.get(1).getPubDate();
+                lastdatesaved = items.get(0).getPubDate();
 
 
-            long  newRowID;
-            newRowID = sqldbobj.insert(DataContract.DataEntry.Table_Name,null,values);
-            rowid.add(newRowID);
+                long newRowID;
+                newRowID = sqldbobj.insert(DataContract.DataEntry.Table_Name, null, values);
+                rowid.add(newRowID);
+            }
+
+            if (!lastdatesaved.isEmpty()) {
+                updateSharedPreference("lastdatesaved", lastdatesaved);
+                updateSharedPreference("size", String.valueOf(items.size()));
+
+            }
         }
-
-        if(!lastdatesaved.isEmpty())
+        catch (Exception e)
         {
-            updateSharedPreference("lastdatesaved",lastdatesaved);
-            int i=0;
+
+
         }
+        finally
+        {
+            sqldbobj.close();
+        }
+
+
 
     }
 
@@ -225,20 +278,41 @@ public class DownloadXMLtask extends AsyncTask<String,Void,List<Item>> {
         if(Lastsaveddate!=null) {
             SimpleDateFormat dfq = new SimpleDateFormat("EEE");
             String CurrentDateq = dfq.format(c.getTime());
-            if (CurrentDateq.equals("Sat"))
+            String[] s = Lastsaveddate.split(",");
+           // Date datetype = df.parse(Lastsaveddate);
+         //   String dateday= dfq.format(datetype);
+            if (CurrentDateq.equals("Sat")||CurrentDateq.equals("Sun"))
             {
                 value=true;
-            }
-            else if (CurrentDate.compareTo(Lastsaveddate) < 0) {
+            } else if (s[0].equals(CurrentDateq)) {
                 value =true;
             }
         }
 
 
-        return   value;
+        return  value;
 
     }
 
 
+    public boolean CheckSize(List<Item> data)  {
 
+         boolean value =false;
+
+        if(getSharedPreference("size")!=null) {
+            int savedsize = Integer.valueOf(getSharedPreference("size"));
+            int size = data.size();
+
+            if (size == savedsize) {
+                return value = true;
+            } else {
+                return value;
+            }
+        }
+        else
+        {
+            return value;
+        }
+
+    }
 }

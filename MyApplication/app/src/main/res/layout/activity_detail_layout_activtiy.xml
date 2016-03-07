@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -9,18 +9,32 @@
         android:layout_height="300dp"
         />
 
+     <TextView
+         android:layout_width="match_parent"
+         android:layout_height="20dp"
+         android:text="Testing"
+         android:id="@+id/txtdate"
+         android:layout_marginTop="10dp"
+         android:layout_below="@id/DetailImageView"/>
+
+
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Description"
-        android:id="@+id/txtdescription"/>
+        android:id="@+id/txtdescription"
+        android:layout_below="@id/txtdate"
+        android:layout_marginTop="10dp"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="link"
         android:autoLink="web"
-        android:id="@+id/txtLink"/>
+        android:id="@+id/txtLink"
+        android:layout_below="@id/txtdescription"
+        android:layout_marginTop="10dp"/>
 
 
-</LinearLayout>
+</RelativeLayout>
