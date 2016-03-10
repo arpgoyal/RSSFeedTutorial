@@ -87,15 +87,19 @@ public class ImageIntentService extends IntentService {
                 connection.setDoInput(true);
                 connection.connect();
                 InputStream is =connection.getInputStream();
+             //   BitmapFactory.Options options= new BitmapFactory.Options();
+             //   BitmapFactory.decodeStream(is,null,options);
+             //   options.inJustDecodeBounds=true;
+              //  options.inSampleSize = 4;
 
-               
 
+             //   Bitmap imagethumb = BitmapFactory.decodeStream(is,null,options);
                 Bitmap imagethumb = BitmapFactory.decodeStream(is);
-                 if(imagethumb!=null)
+
+                 if(imagethumb==null)
                  {
                      Log.d(TAG, "SaveImage:null image");
                  }
-
 
 
                 //ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -107,7 +111,7 @@ public class ImageIntentService extends IntentService {
                 FileOutputStream fosthumb;
                 fosthumb = new FileOutputStream(mypaththumb);
                 imagethumb.compress(Bitmap.CompressFormat.WEBP, 10, fosthumb);
-              //  imagethumb.recycle();
+                // imagethumb.recycle();
 
 
               //  Bitmap image = BitmapFactory.decodeStream(is);

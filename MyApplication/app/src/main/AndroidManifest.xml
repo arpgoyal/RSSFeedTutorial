@@ -49,6 +49,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.neerex.mytutapp.DetailLayoutActivtiy" />
         </activity>
+
+        <activity
+            android:name=".ViewPagerActivity"
+            android:label="FullImage"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.neerex.mytutapp.ViewPagerActivity" />
+        </activity>
         <service  android:name=".ImageService.ImageIntentService" android:exported="false"/>
 
     </application>

@@ -8,10 +8,12 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.URLUtil;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.neerex.mytutapp.Utility.FileUtility;
 import com.squareup.picasso.Picasso;
@@ -22,7 +24,38 @@ import java.io.File;
 
 public class DetailLayoutActivtiy extends AppCompatActivity {
 
+    private float x1,x2;
+    static final int MIN_DISTANCE = 150;
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        switch(event.getAction())
+        {
+            case MotionEvent.ACTION_DOWN:
+                x1 = event.getX();
+                break;
+            case MotionEvent.ACTION_UP:
+                x2 = event.getX();
+                float deltaX = x2 - x1;
+                if (Math.abs(deltaX) > MIN_DISTANCE)
+                {
+                    if(x2>x1) {
+                        Toast.makeText(this, "left2right swipe", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+                        Toast.makeText(this, "right2left swipe", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else
+                {
+                    // consider as something else - a screen tap for example
+                }
+                break;
+        }
+        return super.onTouchEvent(event);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +68,7 @@ public class DetailLayoutActivtiy extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(DetailLayoutActivtiy.this,LargeImageActivity.class);
+                Intent intent = new Intent(DetailLayoutActivtiy.this,ViewPagerActivity.class);
                 intent.putExtra("Url",item.getEnclosure());
                 startActivity(intent);
 
