@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
@@ -54,6 +55,11 @@ public class MainActivity extends AppCompatActivity  {
      */
 
     private static final String url ="http://www.nasa.gov/rss/dyn/image_of_the_day.rss";
+    private static final String urlnews = "http://news.yahoo.com/rss/entertainment";
+    private static final String googlenews ="https://news.google.com/news?cf=all&hl=en&pz=1&ned=in&q=all&output=rss";
+ //   https://news.google.com/news/section?cf=all&ned=in&topic=w&output=rss
+
+
     private List<Item> items;
     private String KEY = "lastdatesaved";
     private SharedPreferences sharedPreferences;
@@ -82,9 +88,10 @@ public class MainActivity extends AppCompatActivity  {
         progressBar.setVisibility(View.VISIBLE);
 
         tabLayout = (TabLayout)findViewById(R.id.tabs);
+
         //tabLayout.setupWithViewPager(pager);
-        tabLayout.addTab(tabLayout.newTab().setText("ListView"),true);
-        tabLayout.addTab(tabLayout.newTab().setText("DetailView"));
+        tabLayout.addTab(tabLayout.newTab().setText("List_View").setIcon(R.mipmap.list),true);
+        tabLayout.addTab(tabLayout.newTab().setText("Page_View").setIcon(R.mipmap.page));
 
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -154,7 +161,7 @@ public class MainActivity extends AppCompatActivity  {
 //        });
 
 
-            task.execute(url);
+            task.execute(urlnews);
             task.result = new Asyncresult() {
                 @Override
                 public void onComplete(List<Item> list) {
@@ -180,6 +187,7 @@ public class MainActivity extends AppCompatActivity  {
                     }
                 }
             };
+
 
 
 

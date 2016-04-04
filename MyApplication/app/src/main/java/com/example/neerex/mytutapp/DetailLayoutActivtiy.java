@@ -68,9 +68,9 @@ public class DetailLayoutActivtiy extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(DetailLayoutActivtiy.this,ViewPagerActivity.class);
-                intent.putExtra("Url",item.getEnclosure());
-                startActivity(intent);
+//                Intent intent = new Intent(DetailLayoutActivtiy.this,ViewPagerActivity.class);
+//                intent.putExtra("Url",item.getEnclosure());
+//                startActivity(intent);
 
             }
         });
@@ -100,9 +100,19 @@ public class DetailLayoutActivtiy extends AppCompatActivity {
             }
 
         }
+        else
+        {
+            imview.setImageResource(R.mipmap.default_image);
+        }
       //  Picasso.with(this).load(item.getEnclosure()).resize(400,300).placeholder(R.drawable.progress_animation).into(imview);
         txtdate.setText(item.getPubDate());
-        txtviewdesc.setText(item.getDescription());
+        if(item.getDescription()!=null) {
+            txtviewdesc.setText(item.getDescription());
+        }
+        else
+        {
+            txtviewdesc.setText("No Description available from the source");
+        }
         txtviewlink.setText(item.getLink());
 
     }

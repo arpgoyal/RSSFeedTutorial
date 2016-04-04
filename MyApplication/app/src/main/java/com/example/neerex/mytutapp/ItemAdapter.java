@@ -87,11 +87,15 @@ public class ItemAdapter extends BaseAdapter {
                  mypath= new File(path+"/"+"thumbnail"+"/",name+".webp");
                 if(mypath.exists())
                 {
-                    Picasso.with(parent.getContext()).load(mypath).resize(80, 80).placeholder(R.mipmap.progress).into(Imageoftheday);
+                    //for high pixel image
+                    //Picasso.with(parent.getContext()).load(mypath).resize(80, 80).placeholder(R.mipmap.progress).into(Imageoftheday);
+                    Picasso.with(parent.getContext()).load(mypath).placeholder(R.mipmap.progress).into(Imageoftheday);
                 }
                 else
                 {
-                    Picasso.with(parent.getContext()).load(localitem.getEnclosure()).resize(80, 80).placeholder(R.mipmap.progress).into(Imageoftheday);
+                    //for high pixel image
+                   // Picasso.with(parent.getContext()).load(localitem.getEnclosure()).resize(80, 80).placeholder(R.mipmap.progress).into(Imageoftheday);
+                    Picasso.with(parent.getContext()).load(localitem.getEnclosure()).placeholder(R.mipmap.progress).into(Imageoftheday);
 
 
                     Intent intent = new Intent(context, ImageIntentService.class);
@@ -103,6 +107,10 @@ public class ItemAdapter extends BaseAdapter {
                 e.printStackTrace();
             }
 
+        }
+        else
+        {
+            Imageoftheday.setImageResource(R.mipmap.default_image);
         }
 
         if(localitem.getTitle() !=null) {

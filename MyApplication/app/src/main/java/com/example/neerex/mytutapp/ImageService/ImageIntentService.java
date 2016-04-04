@@ -7,12 +7,16 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.webkit.URLUtil;
 
+import com.example.neerex.mytutapp.R;
 import com.example.neerex.mytutapp.Utility.FileUtility;
+import com.squareup.picasso.Picasso;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -60,7 +64,7 @@ public class ImageIntentService extends IntentService {
             if (url != null) {
                 //for (int i = 0; i < url.length; i++) {
 
-                        SaveImage(url,1, path);
+                        SaveImagebyPicaaso(url, path);
                         Log.d(TAG, "Service saving the image!");
 
                    // }
@@ -76,6 +80,38 @@ public class ImageIntentService extends IntentService {
     }
 
 
+    public  void SaveImagebyPicaaso(String url,String path) throws IOException {
+
+        Bitmap  ThumbnailImage = Picasso.with(this).load(url).resize(80, 80).get();
+        String name =URLUtil.guessFileName(url, null, null);
+        File mypaththumb = new File(path+"/"+"thumbnail"+"/",name+".webp");
+        FileOutputStream fosthumb;
+        fosthumb = new FileOutputStream(mypaththumb);
+        if(ThumbnailImage!=null) {
+            ThumbnailImage.compress(Bitmap.CompressFormat.WEBP, 100, fosthumb);
+
+        }
+
+
+       int  index = url.lastIndexOf("http://media");
+        String temp= url.substring(index);
+        Bitmap  image = Picasso.with(this).load(temp).resize(400, 300).get();
+        String fullname =URLUtil.guessFileName(url, null, null);
+        //  Bitmap image = BitmapFactory.decodeStream(is);
+        File mypath= new File(path+"/",fullname+".webp");
+        FileOutputStream fos;
+        fos = new FileOutputStream(mypath);
+        if(image!=null) {
+            image.compress(Bitmap.CompressFormat.WEBP, 30, fos);
+
+        }
+
+
+        fos.close();
+        fosthumb.close();
+
+
+    }
 
     public void SaveImage(String url, int i,String path )
     {
@@ -87,40 +123,51 @@ public class ImageIntentService extends IntentService {
                 connection.setDoInput(true);
                 connection.connect();
                 InputStream is =connection.getInputStream();
-             //   BitmapFactory.Options options= new BitmapFactory.Options();
-             //   BitmapFactory.decodeStream(is,null,options);
-             //   options.inJustDecodeBounds=true;
-              //  options.inSampleSize = 4;
 
 
-             //   Bitmap imagethumb = BitmapFactory.decodeStream(is,null,options);
-                Bitmap imagethumb = BitmapFactory.decodeStream(is);
 
-                 if(imagethumb==null)
-                 {
-                     Log.d(TAG, "SaveImage:null image");
-                 }
+                final BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeStream(is, null, options);
+                // Calculate inSampleSize
+                options.inSampleSize = calculateInSampleSize(options, 80, 80);
+                // Decode bitmap with inSampleSize set
+                options.inJustDecodeBounds = false;
+                Bitmap imagethumb=BitmapFactory.decodeStream(new BufferedInputStream(is), null, options);
+          //      Bitmap imagethumb = BitmapFactory.decodeStream(is);
 
 
-                //ByteArrayOutputStream out = new ByteArrayOutputStream();
-               // image.compress(Bitmap.CompressFormat.WEBP,100,out);
-               // Bitmap compressed =BitmapFactory.decodeStream(new ByteArrayInputStream(out.toByteArray()));
                 String name =URLUtil.guessFileName(url, null, null);
-
-                File mypaththumb= new File(path+"/"+"thumbnail"+"/",name+".webp");
+                File mypaththumb = new File(path+"/"+"thumbnail"+"/",name+".webp");
                 FileOutputStream fosthumb;
                 fosthumb = new FileOutputStream(mypaththumb);
-                imagethumb.compress(Bitmap.CompressFormat.WEBP, 10, fosthumb);
-                // imagethumb.recycle();
+                if(imagethumb!=null) {
+                    imagethumb.compress(Bitmap.CompressFormat.WEBP, 100, fosthumb);
+                    imagethumb.recycle();
+                }
 
 
+
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeStream(is, null, options);
+                // Calculate inSampleSize
+                options.inSampleSize = calculateInSampleSize(options, 200, 200);
+                // Decode bitmap with inSampleSize set
+                options.inJustDecodeBounds = false;
+                Bitmap image=BitmapFactory.decodeStream(new BufferedInputStream(is), null, options);
+                //      Bitmap imagethumb = BitmapFactory.decodeStream(is);
+
+
+                String fullname =URLUtil.guessFileName(url, null, null);
               //  Bitmap image = BitmapFactory.decodeStream(is);
-                File mypath= new File(path+"/",name+".webp");
+                File mypath= new File(path+"/",fullname+".webp");
                 FileOutputStream fos;
                 fos = new FileOutputStream(mypath);
-                imagethumb.compress(Bitmap.CompressFormat.WEBP,30, fos);
-                imagethumb.recycle();
+                if(image!=null) {
+                    image.compress(Bitmap.CompressFormat.WEBP, 100, fos);
+                    image.recycle();
 
+                }
 
                 is.close();
                 fos.close();
@@ -135,6 +182,29 @@ public class ImageIntentService extends IntentService {
 
 
 
+    }
+
+    public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 
 

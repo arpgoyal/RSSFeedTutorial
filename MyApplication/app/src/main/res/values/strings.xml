@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">MyTutApp</string>
-    <string name="title_activity_detail_layout_activtiy">DetailLayoutActivtiy</string>
+    <string name="app_name">Nasa Daily Image</string>
+    <string name="title_activity_detail_layout_activtiy">Details</string>
 </resources>

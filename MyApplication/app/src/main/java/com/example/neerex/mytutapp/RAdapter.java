@@ -76,6 +76,7 @@ public class RAdapter extends RecyclerView.Adapter<RAdapter.CustomViewHolder> {
                 }
                 else
                 {
+
                     Picasso.with(context).load(localitem.getEnclosure()).resize(80, 80).placeholder(R.mipmap.progress).into(holder.imageView);
 
 
@@ -88,6 +89,10 @@ public class RAdapter extends RecyclerView.Adapter<RAdapter.CustomViewHolder> {
                 e.printStackTrace();
             }
 
+        }
+        else
+        {
+            holder.imageView.setImageResource(R.mipmap.default_image);
         }
 
         if(localitem.getTitle() !=null) {

@@ -3,14 +3,21 @@ package com.example.neerex.mytutapp;
 import android.util.Log;
 import android.util.Xml;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * Created by Neerex on 26/02/16.
@@ -90,7 +97,14 @@ public  void parser() {
                             if(event==4)
                             {
                                 text = myParser.getText();
-                                objitem.setDescription(text);
+                                if(text.contains("<")) {
+                                    int index=text.lastIndexOf("<br");
+                                    int last = text.lastIndexOf("all");
+                                    text = text.substring(0,index);
+                                    List<String> Items = getImageAndDescription(text);
+                                    objitem.setDescription(Items.get(0));
+                                    objitem.setEnclosure(Items.get(1));
+                                }
                                 break;
                             }
                         }
@@ -137,6 +151,39 @@ public  void parser() {
 
 
 
+    public  List<String> getImageAndDescription(String xml)
+    {
+        List<String> item = new ArrayList<String>();
+
+        try
+        {
+
+            DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+            domFactory.setNamespaceAware(true);
+            domFactory.setIgnoringComments(true);
+            domFactory.setIgnoringElementContentWhitespace(true);
+            domFactory.setCoalescing(true);
+            DocumentBuilder builder =null;
+            Document document = null;
+
+            builder = domFactory.newDocumentBuilder();
+            document = builder.parse(new ByteArrayInputStream(xml.getBytes()));
+            NodeList Img = document.getElementsByTagName("img");
+         //  Element src = (Element)Img.item(0);
+           String description = document.getDocumentElement().getTextContent();
+            String imgurl =Img.item(0).getAttributes().item(0).getNodeValue();
+            item.add(description);
+            item.add(imgurl);
+
+        }
+        catch (Exception ex)
+        {
+              Log.e("tag",ex.toString());
+        }
+
+
+        return  item;
+    }
 
     public List parse(InputStream in) throws IOException, XmlPullParserException {
         XmlPullParser myparser = Xml.newPullParser();
